@@ -52,7 +52,7 @@ const Footer = () => {
         <div className="grid grid-cols-2 md:grid-cols-6 gap-8 mb-12">
           <div className="col-span-2">
             <a href="/" className="inline-block mb-4">
-              <span className="font-serif text-xl font-medium">Scholar<span className="font-bold">Insights</span></span>
+              <span className="font-serif text-xl font-medium">COdin</span>
             </a>
             <p className="text-muted-foreground text-sm mb-4 max-w-xs">
               A platform dedicated to fostering intellectual discourse and academic exploration across diverse disciplines.
@@ -98,7 +98,7 @@ const Footer = () => {
         
         <div className="flex flex-col md:flex-row justify-between items-center">
           <p className="text-sm text-muted-foreground">
-            &copy; {currentYear} ScholarInsights. All rights reserved.
+            &copy; {currentYear} COdin. All rights reserved.
           </p>
           <div className="flex items-center space-x-6 mt-4 md:mt-0">
             <a href="#" className="text-xs text-muted-foreground hover:text-foreground transition-colors">

@@ -1,14 +1,28 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 type Language = 'en' | 'vi';
 type Theme = 'light' | 'dark';
 
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  picture?: string;
+  provider?: 'email' | 'google';
+}
+
 interface AppContextType {
   language: Language;
   theme: Theme;
+  user: User | null;
+  isAuthenticated: boolean;
   setLanguage: (lang: Language) => void;
   setTheme: (theme: Theme) => void;
+  login: (user: User) => void;
+  loginWithGoogle: (credential: any) => void;
+  logout: () => void;
   t: (key: string) => string;
 }
 
@@ -35,7 +49,7 @@ const translations = {
     'section.about': 'About COdin',
     
     // Newsletter
-    'newsletter.title': 'Stay Updated with COdin Insights',
+    'newsletter.title': 'Stay Updated with COdin',
     'newsletter.description': 'Join our newsletter to receive the latest research, analyses, and expert perspectives delivered directly to your inbox.',
     'newsletter.placeholder': 'Your email address',
     'newsletter.button': 'Subscribe',
@@ -62,6 +76,24 @@ const translations = {
     'login.register': 'Don\'t have an account?',
     'login.register.link': 'Register',
     'login.forgot': 'Forgot password?',
+    
+    // Sign In
+    'signin.title': 'Sign In to COdin',
+    'signin.name': 'Full Name',
+    'signin.email': 'Email',
+    'signin.password': 'Password',
+    'signin.confirmPassword': 'Confirm Password',
+    'signin.button': 'Sign In',
+    'signin.login': 'Already have an account?',
+    'signin.login.link': 'Login',
+    'signin.terms': 'By signing in, you agree to our Terms and Privacy Policy',
+    'signin.success': 'Sign In Successful',
+    'signin.success.description': 'Welcome to COdin!',
+    
+    // Search
+    'search.placeholder': 'Search articles...',
+    'search.noResults': 'No results found.',
+    'search.articles': 'Articles',
   },
   vi: {
     // Navigation
@@ -85,7 +117,7 @@ const translations = {
     'section.about': 'Về COdin',
     
     // Newsletter
-    'newsletter.title': 'Cập Nhật với COdin Insights',
+    'newsletter.title': 'Cập Nhật với COdin',
     'newsletter.description': 'Tham gia bản tin của chúng tôi để nhận các nghiên cứu, phân tích và quan điểm chuyên gia mới nhất được gửi trực tiếp đến hộp thư của bạn.',
     'newsletter.placeholder': 'Địa chỉ email của bạn',
     'newsletter.button': 'Đăng ký',
@@ -112,12 +144,32 @@ const translations = {
     'login.register': 'Chưa có tài khoản?',
     'login.register.link': 'Đăng ký',
     'login.forgot': 'Quên mật khẩu?',
+    
+    // Sign In
+    'signin.title': 'Đăng ký vào COdin',
+    'signin.name': 'Họ và tên',
+    'signin.email': 'Email',
+    'signin.password': 'Mật khẩu',
+    'signin.confirmPassword': 'Xác nhận mật khẩu',
+    'signin.button': 'Đăng ký',
+    'signin.login': 'Đã có tài khoản?',
+    'signin.login.link': 'Đăng nhập',
+    'signin.terms': 'Bằng cách đăng ký, bạn đồng ý với Điều khoản và Chính sách Bảo mật của chúng tôi',
+    'signin.success': 'Đăng ký thành công',
+    'signin.success.description': 'Chào mừng đến với COdin!',
+    
+    // Search
+    'search.placeholder': 'Tìm kiếm bài viết...',
+    'search.noResults': 'Không tìm thấy kết quả nào.',
+    'search.articles': 'Bài viết',
   }
 };
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // Google client ID - replace with your actual client ID from Google Cloud Console
+  const googleClientId = "YOUR_GOOGLE_CLIENT_ID";
   const [language, setLanguage] = useState<Language>(() => {
     const savedLanguage = localStorage.getItem('language');
     return (savedLanguage as Language) || 'en';
@@ -127,6 +179,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const savedTheme = localStorage.getItem('theme');
     return (savedTheme as Theme) || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
   });
+
+  const [user, setUser] = useState<User | null>(() => {
+    const savedUser = localStorage.getItem('user');
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
+
+  const isAuthenticated = user !== null;
 
   useEffect(() => {
     localStorage.setItem('language', language);
@@ -141,14 +200,60 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, [theme]);
 
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem('user', JSON.stringify(user));
+    } else {
+      localStorage.removeItem('user');
+    }
+  }, [user]);
+
+  const login = (userData: User) => {
+    setUser(userData);
+  };
+
+  const loginWithGoogle = (credential: any) => {
+    // Parse the JWT token to get user information
+    const payload = JSON.parse(atob(credential.credential.split('.')[1]));
+    
+    // Create a user object from Google credentials
+    const googleUser: User = {
+      id: payload.sub,
+      name: payload.name,
+      email: payload.email,
+      picture: payload.picture,
+      provider: 'google'
+    };
+    
+    // Set the user in state
+    setUser(googleUser);
+  };
+
+  const logout = () => {
+    setUser(null);
+  };
+
   const t = (key: string): string => {
     return translations[language][key] || key;
   };
 
   return (
-    <AppContext.Provider value={{ language, theme, setLanguage, setTheme, t }}>
-      {children}
-    </AppContext.Provider>
+    <GoogleOAuthProvider clientId={googleClientId}>
+      <AppContext.Provider value={{ 
+        language, 
+        theme, 
+        user, 
+        isAuthenticated,
+        setLanguage, 
+        setTheme, 
+        login,
+        loginWithGoogle,
+        logout,
+        t 
+      }}>
+        {children}
+      </AppContext.Provider>
+    </GoogleOAuthProvider>
   );
 };
 

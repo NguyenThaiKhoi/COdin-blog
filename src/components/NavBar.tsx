@@ -6,12 +6,15 @@ import { Menu, Search, X } from "lucide-react";
 import ThemeToggle from './ThemeToggle';
 import LanguageSelector from './LanguageSelector';
 import LoginForm from './LoginForm';
+import SignInForm from './SignInForm';
+import SearchDialog from './SearchDialog';
 import { useApp } from '@/contexts/AppContext';
 
 const NavBar = () => {
   const { t } = useApp();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -59,10 +62,19 @@ const NavBar = () => {
           <div className="flex items-center space-x-1">
             <ThemeToggle />
             <LanguageSelector />
-            <Button variant="ghost" size="icon" className="ml-2" aria-label="Search">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="ml-2" 
+              aria-label="Search"
+              onClick={() => setIsSearchOpen(true)}
+            >
               <Search className="h-[1.2rem] w-[1.2rem]" />
             </Button>
-            <LoginForm />
+            <div className="flex items-center space-x-2">
+              <LoginForm />
+              <SignInForm />
+            </div>
           </div>
         </nav>
 
@@ -75,6 +87,7 @@ const NavBar = () => {
             size="icon" 
             className="mr-2" 
             aria-label="Search"
+            onClick={() => setIsSearchOpen(true)}
           >
             <Search className="h-5 w-5" />
           </Button>
@@ -109,9 +122,15 @@ const NavBar = () => {
               {item.name}
             </a>
           ))}
-          <LoginForm />
+          <div className="flex flex-col items-center space-y-4">
+            <LoginForm />
+            <SignInForm />
+          </div>
         </nav>
       </div>
+
+      {/* Search Dialog */}
+      <SearchDialog open={isSearchOpen} onOpenChange={setIsSearchOpen} />
     </header>
   );
 };
