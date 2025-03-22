@@ -3,13 +3,14 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollText } from "lucide-react";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "@/hooks/use-toast";
 
 const Newsletter = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success("Thanks for subscribing!", {
-      description: "You'll receive our next academic digest soon.",
+    toast({
+      title: "Thanks for subscribing!",
+      description: "You'll receive our next academic digest soon."
     });
   };
 
