@@ -3,8 +3,13 @@ import React, { useState, useEffect } from 'react';
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Menu, Search, X } from "lucide-react";
+import ThemeToggle from './ThemeToggle';
+import LanguageSelector from './LanguageSelector';
+import LoginForm from './LoginForm';
+import { useApp } from '@/contexts/AppContext';
 
 const NavBar = () => {
+  const { t } = useApp();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -18,10 +23,10 @@ const NavBar = () => {
   }, []);
 
   const navItems = [
-    { name: 'Articles', href: '#articles' },
-    { name: 'Topics', href: '#topics' },
-    { name: 'About', href: '#about' },
-    { name: 'Contact', href: '#contact' },
+    { name: t('nav.articles'), href: '#articles' },
+    { name: t('nav.topics'), href: '#topics' },
+    { name: t('nav.about'), href: '#about' },
+    { name: t('nav.contact'), href: '#contact' },
   ];
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -31,13 +36,13 @@ const NavBar = () => {
       className={cn(
         "fixed top-0 left-0 right-0 z-50 py-4 transition-all duration-300 ease-in-out border-b",
         isScrolled 
-          ? "bg-white/90 backdrop-blur-md border-border/40 shadow-sm" 
+          ? "bg-background/90 backdrop-blur-md border-border/40 shadow-sm" 
           : "bg-transparent border-transparent"
       )}
     >
       <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
         <a href="/" className="flex items-center">
-          <span className="font-serif text-xl font-medium">Scholar<span className="font-bold">Insights</span></span>
+          <span className="font-serif text-xl font-medium">CO<span className="font-bold">din</span></span>
         </a>
 
         {/* Desktop Navigation */}
@@ -51,16 +56,20 @@ const NavBar = () => {
               {item.name}
             </a>
           ))}
-          <Button variant="ghost" size="icon" className="ml-2" aria-label="Search">
-            <Search className="h-[1.2rem] w-[1.2rem]" />
-          </Button>
-          <Button size="sm" className="ml-2 rounded-full">
-            Subscribe
-          </Button>
+          <div className="flex items-center space-x-1">
+            <ThemeToggle />
+            <LanguageSelector />
+            <Button variant="ghost" size="icon" className="ml-2" aria-label="Search">
+              <Search className="h-[1.2rem] w-[1.2rem]" />
+            </Button>
+            <LoginForm />
+          </div>
         </nav>
 
         {/* Mobile Menu Button */}
         <div className="flex items-center md:hidden">
+          <ThemeToggle />
+          <LanguageSelector />
           <Button 
             variant="ghost" 
             size="icon" 
@@ -100,9 +109,7 @@ const NavBar = () => {
               {item.name}
             </a>
           ))}
-          <Button className="mt-6 w-full rounded-full" onClick={toggleMobileMenu}>
-            Subscribe
-          </Button>
+          <LoginForm />
         </nav>
       </div>
     </header>

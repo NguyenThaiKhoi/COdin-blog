@@ -4,13 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollText } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { useApp } from '@/contexts/AppContext';
 
 const Newsletter = () => {
+  const { t } = useApp();
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     toast({
-      title: "Thanks for subscribing!",
-      description: "You'll receive our next academic digest soon."
+      title: t('newsletter.success'),
+      description: t('newsletter.success.description')
     });
   };
 
@@ -32,17 +35,17 @@ const Newsletter = () => {
           
           <div>
             <h2 className="text-2xl md:text-3xl font-bold font-serif tracking-tight mb-4">
-              Stay Updated with Academic Insights
+              {t('newsletter.title')}
             </h2>
             <p className="text-accent-foreground/80 max-w-xl mx-auto">
-              Join our newsletter to receive the latest research, analyses, and expert perspectives delivered directly to your inbox.
+              {t('newsletter.description')}
             </p>
           </div>
           
           <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4 justify-center max-w-lg mx-auto">
             <Input
               type="email"
-              placeholder="Your email address"
+              placeholder={t('newsletter.placeholder')}
               className="bg-accent-foreground/10 border-accent-foreground/20 placeholder:text-accent-foreground/50 focus-visible:ring-accent-foreground/30 text-white"
               required
             />
@@ -50,12 +53,12 @@ const Newsletter = () => {
               type="submit"
               className="bg-white text-accent hover:bg-white/90 rounded-full"
             >
-              Subscribe
+              {t('newsletter.button')}
             </Button>
           </form>
           
           <p className="text-xs text-accent-foreground/60">
-            We respect your privacy. Unsubscribe at any time.
+            {t('newsletter.privacy')}
           </p>
         </div>
       </div>
